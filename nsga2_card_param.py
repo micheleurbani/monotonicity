@@ -4,6 +4,7 @@
 # In[ ]:
 
 
+import argparse
 import numpy as np
 import pandas as pd
 import sys
@@ -505,7 +506,14 @@ core.new_belief_entropy
 
 
 
-max_fod_size = 2  #Maximum size of the frame of discernment
+parser = argparse.ArgumentParser(description="NSGA-II belief function optimization")
+parser.add_argument("--seed", type=int, default=1, help="Random seed (default: 1)")
+parser.add_argument("--n-gen", type=int, default=200, help="Number of generations (default: 200)")
+parser.add_argument("--pop-size", type=int, default=200, help="Population size (default: 200)")
+parser.add_argument("--fod-size", type=int, default=2, help="Maximum frame of discernment size (default: 2)")
+args = parser.parse_args()
+
+max_fod_size = args.fod_size  #Maximum size of the frame of discernment
 results = []  # Store the results of each optimization run
 monotonicity_violations = {}  # Store monotonicity violations
 all_measures_data = []
@@ -515,8 +523,8 @@ entropy_measures_to_check = entropy_measures.copy() #Create a copy of the list f
 for fod_size in range(2, max_fod_size + 1): #Iterate over frame of discernment sizes
     print(f"\n\nFOD Size: {fod_size}")
     X = set(range(1, fod_size + 1)) # Frame of discernment
-    pop_size = 200 #* fod_size #Population size, scales with FOD size
-    n_gen = 200 #* fod_size  #Number of generations, scales with FOD size
+    pop_size = args.pop_size  #Population size
+    n_gen = args.n_gen  #Number of generations
 
     measures_for_current_fod = entropy_measures_to_check.copy() #List of measures for the current FOD size
 
@@ -528,7 +536,7 @@ for fod_size in range(2, max_fod_size + 1): #Iterate over frame of discernment s
         algorithm = NSGA2(pop_size=pop_size, sampling=QuantizedWarmStartLHS(QuantizedLHS), repair=BeliefRepair()) #
 
         # Run the optimization
-        res = minimize(problem, algorithm, ('n_gen', n_gen), verbose=True, save_history=True, seed=1)
+        res = minimize(problem, algorithm, ('n_gen', n_gen), verbose=True, save_history=True, seed=args.seed)
 
 
         if res.F is not None and res.F.size > 0: #Check if feasible solutions where found
