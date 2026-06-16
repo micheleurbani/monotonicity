@@ -45,6 +45,8 @@ cat > "$SLURM_SCRIPT" << EOF
 #!/bin/bash
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
+#SBATCH --nodes=1
+#SBATCH --mem=8G
 #SBATCH --time=${TIME_LIMIT}:00:00
 #SBATCH --job-name=monotonicity_fod${FOD_SIZE}
 #SBATCH --output=logs/slurm_%j.out
